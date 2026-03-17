@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <header>
+        <div class="logo">logo</div>
+        <nav>
+            <ul>
+                <li><a href="#">home</a></li>
+            </ul>
+        </nav>
+        <div class="search">
+            <form>
+                <input type="text" placeholder="search">
+                <input type="text" placeholder="destination">
+            </form>       
+        </div>
+        <div class="cart-icon">
+            <a href="cart.html">
+                <img src="https://cdn-icons-png.flaticon.com/512/4290/4290854.png" alt="Cart">
+                <span class="cart-count">0</span>
+            </a>
+        </div>
+    </header>
+
+    <section class="confirmation-container">
+        <div class="checkout-steps">
+            <div class="step completed">1. Shipping Information</div>
+            <div class="step completed">2. Payment</div>
+            <div class="step completed active">3. Confirmation</div>
+        </div>
+        
+        <div class="confirmation-message">
+            <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Success">
+            <h2>Thank You For Your Order!</h2>
+            <p>Your order number is: <strong id="order-number"></strong></p>
+            <p>We've sent a confirmation email to <strong id="confirmation-email"></strong></p>
+            
+            <div class="order-details">
+                <h3>Order Details</h3>
+                <div id="confirmation-items"></div>
+                <div class="order-total">
+                    <p>Total: ₹<span id="confirmation-total">0</span></p>
+                </div>
+            </div>
+            
+            <div class="shipping-details">
+                <h3>Shipping To</h3>
+                <p id="shipping-address"></p>
+            </div>
+            
+            <button onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script>
+        // Display confirmation details
+        function displayConfirmationDetails() {
+            const shippingInfo = JSON.parse(localStorage.getItem('shippingInfo'));
+            const paymentInfo = JSON.parse(localStorage.getItem('paymentInfo'));
+            const orderNumber = localStorage.getItem('orderNumber');
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            
+            if (!orderNumber) {
+                window.location.href = 'cart.html';
+                return;
+            }
+            
+            // Display order info
+            document.getElementById('order-number').textContent = orderNumber;
+            document.getElementById('confirmation-email').textContent = shippingInfo.email;
+            document.getElementById('shipping-address').textContent = 
+                `${shippingInfo.name}\n${shippingInfo.address}\nPhone: ${shippingInfo.phone}`;
+            
+            // Display order items
+            const confirmationItems = document.getElementById('confirmation-items');
+            let total = 0;
+            confirmationItems.innerHTML = '';
+            
+            cart.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'order-item';
+                itemElement.innerHTML = `
+                    <p>${item.name} - ₹${item.price}</p>
+                `;
+                confirmationItems.appendChild(itemElement);
+                total += item.price;
+            });
+            
+            document.getElementById('confirmation-total').textContent = total;
+            
+            // Clear order data from localStorage (except for demo purposes)
+            // localStorage.removeItem('shippingInfo');
+            // localStorage.removeItem('paymentInfo');
+            // localStorage.removeItem('orderNumber');
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            displayConfirmationDetails();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="common.css">
+   
+</head>
+<body>
+
+
+    <section class="checkout-container">
+        <h2>Checkout</h2>
+        <div class="checkout-steps">
+            <div class="step active">1. Shipping Information</div>
+            <div class="step">2. Payment</div>
+            <div class="step">3. Confirmation</div>
+        </div>
+        
+        <form id="checkout-form">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Shipping Address</label>
+                <textarea id="address" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" required>
+            </div>
+            
+            <div class="order-summary">
+                <h3>Order Summary</h3>
+                <div id="order-items"></div>
+                <div class="order-total">
+                    <p>Total: ₹<span id="order-total">0</span></p>
+                </div>
+            </div>
+            
+            <button type="button" onclick="proceedToPayment()">Proceed to Payment</button>
+        </form>
+    </section>
+
+    <script src="script.js"></script>
+    <script>
+        // Display order items and total
+        function displayOrderSummary() {
+            const cart = JSON.parse(localStorage.getItem('cart'));
+            const orderItems = document.getElementById('order-items');
+            const orderTotal = document.getElementById('order-total');
+            
+            if (!cart || cart.length === 0) {
+                window.location.href = 'cart.html';
+                return;
+            }
+            
+            let total = 0;
+            orderItems.innerHTML = '';
+            
+            cart.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'order-item';
+                itemElement.innerHTML = `
+                    <p>${item.name} - ₹${item.price}</p>
+                `;
+                orderItems.appendChild(itemElement);
+                total += item.price;
+            });
+            
+            orderTotal.textContent = total;
+        }
+        
+        // Proceed to payment page
+        function proceedToPayment() {
+            const form = document.getElementById('checkout-form');
+            if (form.checkValidity()) {
+                // Save shipping info to localStorage
+                const shippingInfo = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    address: document.getElementById('address').value,
+                    phone: document.getElementById('phone').value
+                };
+                localStorage.setItem('shippingInfo', JSON.stringify(shippingInfo));
+                
+                window.location.href = 'payment.html';
+            } else {
+                form.reportValidity();
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            displayOrderSummary();
+        });
+    </script>
+</body>
+</html>
